@@ -1,9 +1,11 @@
 #!/usr/bin/env xonsh
+import sys
 import os
 import re
 import subprocess as sp
 import tempfile
 from pathlib import Path
+import shutil
 
 from xonsh.built_ins import XonshSession, XSH
 from xonsh.completers import completer
@@ -87,6 +89,8 @@ def python_argcomplete(ctx: CommandContext):
     cmd = ctx.args[0].value
     line = ctx.text_before_cursor
 
+    # print(f"python_argcomplete: {cmd}, {line}, {ctx}")
+
     args = None
     if ctx.arg_index > 1 and _get_executor(cmd):
         # Handle the case where the script is executed with Python/xonsh binary
@@ -104,6 +108,15 @@ def python_argcomplete(ctx: CommandContext):
         # handle case where script is executed like `./script.py`, `./script.xsh`
         if os.path.isfile(cmd) and _python_argcomplete_scan_head(cmd):
             args = [cmd]
+
+    if not args:
+        file_path = shutil.which(cmd)
+        if (
+            file_path
+            and os.path.isfile(file_path)
+            and _python_argcomplete_scan_head(file_path)
+        ):
+            args = [sys.executable, file_path]
 
     if args:
         # todo: return dict once supported
