@@ -102,7 +102,7 @@ def python_argcomplete(ctx: CommandContext):
 
     if not args:
         # handle case where script is executed like `./script.py`, `./script.xsh`
-        if os.path.exists(cmd) and _python_argcomplete_scan_head(cmd):
+        if os.path.isfile(cmd) and _python_argcomplete_scan_head(cmd):
             args = [cmd]
 
     if args:
